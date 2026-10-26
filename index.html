@@ -1,0 +1,1099 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>INVENTA+ Inventário</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-title" content="INVENTA+">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root{
+  --bg:#f4f5f7;--card:#ffffff;--ink:#16191d;--muted:#5f6670;--line:#e2e5ea;--soft:#eef1f5;
+  --acc:#1d4ed8;--acc-soft:#e3ebff;--ok:#16803c;--ok-soft:#e1f5e7;--warn:#b7791f;--warn-soft:#fdf3dc;
+  --bad:#c53030;--bad-soft:#fde5e5;--gray:#6b7280;--gray-soft:#eceef1;
+  --r:14px;--nav:64px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1115;--card:#181b21;--ink:#eef0f3;--muted:#a3aab5;--line:#2a2f38;--soft:#20242c;
+  --acc:#6b93ff;--acc-soft:#1c2747;--ok:#4cc27a;--ok-soft:#14301f;--warn:#e7b04a;--warn-soft:#352812;
+  --bad:#f07070;--bad-soft:#3a1717;--gray:#9aa2ad;--gray-soft:#262a31;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1115;--card:#181b21;--ink:#eef0f3;--muted:#a3aab5;--line:#2a2f38;--soft:#20242c;
+  --acc:#6b93ff;--acc-soft:#1c2747;--ok:#4cc27a;--ok-soft:#14301f;--warn:#e7b04a;--warn-soft:#352812;
+  --bad:#f07070;--bad-soft:#3a1717;--gray:#9aa2ad;--gray-soft:#262a31;color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+body{padding-bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 12px)}
+button,input,select,textarea{font:inherit;color:inherit}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:25;background:var(--card)}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--card);border-bottom:1px solid var(--line);padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:10px}
+header.top .t{flex:1;min-width:0}
+header.top h1{font-size:17px;margin:0;font-weight:700}
+header.top .sub{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.back{border:0;background:var(--soft);border-radius:10px;width:40px;height:40px;font-size:20px;cursor:pointer}
+main{max-width:720px;margin:0 auto;padding-block:14px 0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom,0px);padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+nav.tabs button{flex:1;height:var(--nav);border:0;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11.5px;color:var(--muted);cursor:pointer;position:relative}
+nav.tabs button .i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button.on{color:var(--acc);font-weight:600}
+nav.tabs .badge{position:absolute;top:7px;left:calc(50% + 6px);background:var(--bad);color:#fff;border-radius:9px;font-size:10.5px;padding:0 5px;min-width:17px;height:17px;line-height:17px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.card h2{font-size:15px;margin:0 0 10px}
+.muted{color:var(--muted)}.small{font-size:13px}.xs{font-size:12px}
+.row{display:flex;gap:10px;align-items:center}.row>*{min-width:0}
+.grow{flex:1}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;cursor:pointer;text-align:left}
+.kpi .v{font-size:26px;font-weight:700;line-height:1.1}
+.kpi .l{font-size:12.5px;color:var(--muted)}
+.bar{height:10px;border-radius:6px;background:var(--soft);overflow:hidden;margin:8px 0 4px}
+.bar>i{display:block;height:100%;background:var(--acc)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-weight:600;font-size:16px;cursor:pointer;padding:10px 14px;text-align:center}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.sm{min-height:40px;font-size:14px;width:auto;padding:6px 12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.stack>*+*{margin-top:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px;font-weight:600}
+.inp{width:100%;min-height:50px;border:1.5px solid var(--line);border-radius:12px;background:var(--card);padding:10px 12px;font-size:17px;outline:none}
+.inp:focus{border-color:var(--acc)}
+.inp.big{font-size:28px;font-weight:700;text-align:right;min-height:62px}
+textarea.inp{min-height:70px;font-size:16px;resize:vertical}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:20px;padding:7px 13px;font-size:14px;cursor:pointer;white-space:nowrap}
+.chip.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc);font-weight:600}
+.scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.scrollx .chips{flex-wrap:nowrap}
+.search{position:sticky;top:calc(env(safe-area-inset-top,0px) + 61px);z-index:10;background:var(--bg);padding:2px 0 10px}
+.list{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.item:last-child{border-bottom:0}
+.item:active{background:var(--soft)}
+.item .main{flex:1;min-width:0}
+.item .code{font-weight:700;font-size:15px}
+.item .desc{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .meta{font-size:12.5px;color:var(--muted)}
+.item .right{text-align:right;font-size:13px;white-space:nowrap}
+.dot{width:12px;height:12px;border-radius:50%;flex:none;background:var(--gray)}
+.dot.verde{background:var(--ok)}.dot.amarelo{background:var(--warn)}.dot.vermelho{background:var(--bad)}.dot.nao{background:transparent;border:2px solid var(--gray)}.dot.cont{background:var(--gray)}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 7px;letter-spacing:.2px}
+.tag.verde{background:var(--ok-soft);color:var(--ok)}.tag.amarelo{background:var(--warn-soft);color:var(--warn)}.tag.vermelho{background:var(--bad-soft);color:var(--bad)}.tag.cinza{background:var(--gray-soft);color:var(--gray)}.tag.azul{background:var(--acc-soft);color:var(--acc)}
+.res{border-radius:var(--r);padding:14px;border:2px solid var(--line);margin-bottom:12px;background:var(--card)}
+.res.verde{border-color:var(--ok);background:var(--ok-soft)}.res.amarelo{border-color:var(--warn);background:var(--warn-soft)}.res.vermelho{border-color:var(--bad);background:var(--bad-soft)}.res.cinza{border-color:var(--line)}
+.res .head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:700;font-size:17px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:15px}
+.kv .k{color:var(--muted)}.kv .v{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.prodhead .code{font-size:20px;font-weight:800}
+.prodhead .desc{font-size:15px;margin:2px 0 6px}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.thumb{width:64px;height:64px;border-radius:10px;object-fit:cover;border:1px solid var(--line);cursor:pointer;background:var(--soft)}
+.thumbwrap{position:relative}
+.thumbwrap .x{position:absolute;top:-6px;right:-6px;width:24px;height:24px;border-radius:50%;border:0;background:var(--bad);color:#fff;font-size:14px;cursor:pointer}
+.count{padding:12px 0;border-bottom:1px solid var(--line)}
+.count:last-child{border-bottom:0}
+.count.estornada{opacity:.55}
+.count.estornada .q{text-decoration:line-through}
+.count .q{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th,table.t td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left}
+table.t th{font-size:12px;color:var(--muted);font-weight:700}
+table.t td.n,table.t th.n{text-align:right;font-variant-numeric:tabular-nums}
+.empty{text-align:center;padding:28px 14px;color:var(--muted)}
+.menu .item .i{font-size:22px;width:28px;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 14px);transform:translateX(-50%) translateY(20px);background:#111827;color:#fff;padding:11px 16px;border-radius:12px;font-size:14.5px;opacity:0;transition:.2s;z-index:60;max-width:92vw;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.modal .box{background:var(--card);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+@media(min-width:700px){.modal{align-items:center}.modal .box{border-radius:18px}}
+.modal h3{margin:0 0 8px;font-size:18px}
+.viewer{position:fixed;inset:0;background:#000;z-index:70;display:flex;align-items:center;justify-content:center}
+.viewer img{max-width:100%;max-height:100%}
+.viewer button{position:absolute;top:calc(env(safe-area-inset-top) + 10px);right:12px}
+.sec{font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:18px 2px 8px}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 0}
+.sw input{width:24px;height:24px}
+.pill{font-size:12px;border-radius:20px;padding:3px 9px;background:var(--soft);color:var(--muted)}
+.warnbox{background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+.errbox{background:var(--bad-soft);border:1px solid var(--bad);border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+.okbox{background:var(--ok-soft);border:1px solid var(--ok);border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+.sticky-actions{position:sticky;bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 6px);z-index:5}
+</style>
+</head>
+<body>
+<header class="top">
+  <button class="back" id="btnBack" aria-label="Voltar" hidden>‹</button>
+  <div class="t"><h1 id="hTitle">INVENTA+</h1><div class="sub" id="hSub">Inventário físico offline</div></div>
+  <span class="pill" id="hUser"></span>
+</header>
+<main id="view"></main>
+<nav class="tabs" id="tabs">
+  <button data-go="#/" data-tab="inicio"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início</button>
+  <button data-go="#/produtos" data-tab="produtos"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Produtos</button>
+  <button data-go="#/pendencias" data-tab="pendencias"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Pendências<span class="badge" id="bPend" hidden></span></button>
+  <button data-go="#/divergencias" data-tab="divergencias"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l9.5 17h-19z"/><path d="M12 10v4M12 17.2v.3"/></svg>Divergências<span class="badge" id="bDiv" hidden></span></button>
+  <button data-go="#/mais" data-tab="mais"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/></svg>Mais</button>
+</nav>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+/* =====================================================================
+   INVENTA+ · Inventário físico offline (arquivo único, sem dependências)
+   Armazenamento: IndexedDB (fallback: localStorage)
+   ===================================================================== */
+
+// ---------- utilitários ----------
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const nowISO = () => new Date().toISOString();
+const r3 = n => Math.round(n * 1000) / 1000;
+const fmt = (n, d = 3) => (n == null || !isFinite(n)) ? '—' : Number(n).toLocaleString('pt-BR', {minimumFractionDigits: 0, maximumFractionDigits: d});
+const fmt2 = n => (n == null || !isFinite(n)) ? '—' : Number(n).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const fmtPct = n => n == null ? 'n/c' : (n > 0 ? '+' : '') + fmt2(n) + '%';
+const fmtSig = n => (n > 0 ? '+' : '') + fmt(n);
+const dt = iso => { if (!iso) return ''; const d = new Date(iso); return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit', second: '2-digit'}); };
+const hm = iso => iso ? new Date(iso).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}) : '';
+const norm = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+const keyOf = p => [p.codigo, p.deriv || '', p.dep || ''].join('|');
+const cmpOrdem = (a, b) => (a.codigo + ' ' + (a.deriv || '')).localeCompare(b.codigo + ' ' + (b.deriv || ''), 'pt-BR', {numeric: true}) || String(a.dep || '').localeCompare(String(b.dep || ''));
+
+function parseNum(v) {
+  if (typeof v === 'number') return v;
+  let s = String(v ?? '').trim().replace(/\s/g, '').replace(/^R\$/, '');
+  if (!s) return NaN;
+  const hasC = s.includes(','), hasD = s.includes('.');
+  if (hasC && hasD) {
+    if (s.lastIndexOf(',') > s.lastIndexOf('.')) s = s.replace(/\./g, '').replace(',', '.');
+    else s = s.replace(/,/g, '');
+  } else if (hasC) {
+    s = /^-?\d{1,3}(,\d{3})+$/.test(s) && !/,\d{1,2}$/.test(s) ? s.replace(/,/g, '') : s.replace(',', '.');
+  } else if (hasD) {
+    if (/^-?\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, '');
+  }
+  if (!/^-?\d*\.?\d+(e-?\d+)?$/i.test(s)) return NaN;
+  return Number(s);
+}
+// avalia expressões simples digitadas (ex.: 12*25+8) com segurança
+function evalQtd(txt) {
+  let s = String(txt ?? '').trim();
+  if (!s) return NaN;
+  if (!/[+\-*/x×()]/.test(s.replace(/^-/, ''))) return parseNum(s);
+  s = s.replace(/[x×]/gi, '*');
+  if (!/^[\d\s.,+\-*/()]+$/.test(s)) return NaN;
+  const toks = s.match(/\d[\d.,]*|[+\-*/()]/g);
+  if (!toks) return NaN;
+  let i = 0;
+  const peek = () => toks[i], next = () => toks[i++];
+  function prim() { const t = next(); if (t === '(') { const v = expr(); if (next() !== ')') throw 0; return v; } if (t === '-') return -prim(); const n = parseNum(t); if (isNaN(n)) throw 0; return n; }
+  function term() { let v = prim(); while (peek() === '*' || peek() === '/') { const o = next(), w = prim(); v = o === '*' ? v * w : v / w; } return v; }
+  function expr() { let v = term(); while (peek() === '+' || peek() === '-') { const o = next(), w = term(); v = o === '+' ? v + w : v - w; } return v; }
+  try { const v = expr(); return i === toks.length && isFinite(v) ? r3(v) : NaN; } catch (e) { return NaN; }
+}
+
+// ---------- banco de dados local ----------
+const STORES = ['meta', 'inventarios', 'produtos', 'contagens', 'fotos', 'historico'];
+const DB = {
+  idb: null, mode: 'memoria', cache: {},
+  async open() {
+    try {
+      if (!('indexedDB' in window)) throw new Error('sem indexedDB');
+      this.idb = await new Promise((res, rej) => {
+        const rq = indexedDB.open('inventa_plus', 1);
+        rq.onupgradeneeded = () => { const db = rq.result; for (const s of STORES) if (!db.objectStoreNames.contains(s)) db.createObjectStore(s, {keyPath: 'id'}); };
+        rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); rq.onblocked = () => rej(new Error('bloqueado'));
+        setTimeout(() => rej(new Error('timeout')), 6000);
+      });
+      this.mode = 'IndexedDB';
+    } catch (e) {
+      this.idb = null;
+      try { localStorage.setItem('__t', '1'); localStorage.removeItem('__t'); this.mode = 'localStorage'; } catch (e2) { this.mode = 'memoria'; }
+      for (const s of STORES) { try { this.cache[s] = JSON.parse(localStorage.getItem('inventa_' + s) || '[]'); } catch (e3) { this.cache[s] = []; } }
+    }
+  },
+  _lsSave(s) { if (this.mode !== 'localStorage') return; try { localStorage.setItem('inventa_' + s, JSON.stringify(this.cache[s])); } catch (e) { toast('Sem espaço no armazenamento do navegador. Exporte um backup.'); throw e; } },
+  async all(s) {
+    if (!this.idb) return (this.cache[s] || []).slice();
+    return new Promise((res, rej) => { const rq = this.idb.transaction(s).objectStore(s).getAll(); rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); });
+  },
+  async get(s, id) {
+    if (!this.idb) return (this.cache[s] || []).find(o => o.id === id);
+    return new Promise((res, rej) => { const rq = this.idb.transaction(s).objectStore(s).get(id); rq.onsuccess = () => res(rq.result); rq.onerror = () => rej(rq.error); });
+  },
+  async putMany(s, arr) {
+    if (!arr.length) return;
+    if (!this.idb) { const c = this.cache[s]; for (const o of arr) { const i = c.findIndex(x => x.id === o.id); if (i >= 0) c[i] = o; else c.push(o); } this._lsSave(s); return; }
+    return new Promise((res, rej) => { const tx = this.idb.transaction(s, 'readwrite'); const st = tx.objectStore(s); for (const o of arr) st.put(o); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error); });
+  },
+  async put(s, o) { return this.putMany(s, [o]); },
+  async delMany(s, ids) {
+    if (!ids.length) return;
+    if (!this.idb) { const set = new Set(ids); this.cache[s] = this.cache[s].filter(o => !set.has(o.id)); this._lsSave(s); return; }
+    return new Promise((res, rej) => { const tx = this.idb.transaction(s, 'readwrite'); const st = tx.objectStore(s); for (const id of ids) st.delete(id); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); });
+  }
+};
+
+// ---------- estado ----------
+const DEF_CFG = {id: 'cfg', usuario: '', tolVerde: 0, tolAmarelo: 0, tolAbs: 0, cega: false, invAtivo: null, persistido: false};
+const S = {cfg: {...DEF_CFG}, invs: [], inv: null, prods: [], conts: [], hist: [], pending: {fotos: []}, filtros: {produtos: 'todos', pend: 'nao', div: 'todos', q: ''}, lastLocal: ''};
+
+async function loadAll() {
+  const meta = await DB.get('meta', 'cfg');
+  S.cfg = {...DEF_CFG, ...(meta || {})};
+  S.invs = (await DB.all('inventarios')).sort((a, b) => b.criadoEm.localeCompare(a.criadoEm));
+  S.inv = S.invs.find(i => i.id === S.cfg.invAtivo) || S.invs[0] || null;
+  await loadInv();
+}
+async function loadInv() {
+  if (!S.inv) { S.prods = []; S.conts = []; S.hist = []; return; }
+  const id = S.inv.id;
+  S.prods = (await DB.all('produtos')).filter(p => p.inv === id).sort(cmpOrdem);
+  S.conts = (await DB.all('contagens')).filter(c => c.inv === id).sort((a, b) => a.dataHora.localeCompare(b.dataHora));
+  S.hist = (await DB.all('historico')).filter(h => h.inv === id).sort((a, b) => b.ts.localeCompare(a.ts));
+}
+async function saveCfg() { await DB.put('meta', S.cfg); }
+async function log(acao, prod, detalhe, antes, depois) {
+  const h = {id: uid(), inv: S.inv ? S.inv.id : null, prod: prod ? prod.id : null, prodRef: prod ? prod.codigo + (prod.deriv ? '/' + prod.deriv : '') : '', ts: nowISO(), usuario: S.cfg.usuario || '(sem nome)', acao, detalhe: detalhe || '', antes: antes == null ? '' : String(antes), depois: depois == null ? '' : String(depois)};
+  S.hist.unshift(h);
+  await DB.put('historico', h);
+}
+
+// ---------- regras de cálculo ----------
+function contsDe(p, rodada = p.rodada, incluirEstornos = false) { return S.conts.filter(c => c.prod === p.id && c.rodada === rodada && (incluirEstornos || c.status === 'valida')); }
+function calc(p, rodada = p.rodada) {
+  const cs = contsDe(p, rodada);
+  const fis = r3(cs.reduce((a, c) => a + c.qtd, 0));
+  const pesoN = cs.filter(c => c.peso != null);
+  const peso = pesoN.length ? r3(pesoN.reduce((a, c) => a + c.peso, 0)) : null;
+  const erp = p.saldo;
+  const dif = r3(fis - erp);
+  const pct = erp !== 0 ? (dif / Math.abs(erp)) * 100 : (fis === 0 ? 0 : null);
+  return {fis, peso, erp, dif, pct, n: cs.length, cor: corDe(dif, pct)};
+}
+function corDe(dif, pct) {
+  const c = S.cfg;
+  if (Math.abs(dif) <= Number(c.tolAbs || 0) + 1e-9) return 'verde';
+  if (pct == null) return 'vermelho';
+  const a = Math.abs(pct);
+  if (a <= Number(c.tolVerde || 0) + 1e-9) return 'verde';
+  if (a <= Number(c.tolAmarelo || 0) + 1e-9) return 'amarelo';
+  return 'vermelho';
+}
+// situação do produto no fluxo
+function sit(p) {
+  if (p.status === 'nao') return 'nao';
+  if (p.status === 'cont') return 'cont';
+  const r = calc(p);
+  if (r.cor === 'vermelho' && !p.aceito) return 'recontar';
+  return r.cor; // verde | amarelo | vermelho (aceito)
+}
+function resumo() {
+  const o = {total: S.prods.length, nao: 0, cont: 0, concl: 0, verde: 0, amarelo: 0, vermelho: 0, recontar: 0, recontados: 0};
+  for (const p of S.prods) {
+    if (p.rodada > 1) o.recontados++;
+    if (p.status === 'nao') { o.nao++; continue; }
+    if (p.status === 'cont') { o.cont++; continue; }
+    o.concl++;
+    const c = calc(p).cor; o[c]++;
+    if (c === 'vermelho' && !p.aceito) o.recontar++;
+  }
+  o.pend = o.nao + o.cont + o.recontar;
+  o.div = o.amarelo + o.vermelho;
+  return o;
+}
+const corLabel = {verde: 'VERDE', amarelo: 'AMARELO', vermelho: 'VERMELHO', cinza: 'EM CONTAGEM'};
+function statusTag(p) {
+  const s = sit(p);
+  if (s === 'nao') return '<span class="tag cinza">NÃO CONTADO</span>';
+  if (s === 'cont') return '<span class="tag azul">EM CONTAGEM' + (p.rodada > 1 ? ' · R' + p.rodada : '') + '</span>';
+  if (s === 'recontar') return '<span class="tag vermelho">RECONTAR</span>';
+  return `<span class="tag ${s}">${corLabel[s]}${p.aceito ? ' · ACEITO' : ''}${p.rodada > 1 ? ' · R' + p.rodada : ''}</span>`;
+}
+function dotCls(p) { const s = sit(p); return s === 'recontar' ? 'vermelho' : s; }
+const ro = () => S.inv && S.inv.status === 'encerrado';
+const saldoVisivel = p => !S.cfg.cega || p.status !== 'nao' || contsDe(p).length > 0;
+
+// ---------- leitura de planilhas (XLSX sem biblioteca + CSV) ----------
+async function readZip(buf) {
+  const dv = new DataView(buf), u8 = new Uint8Array(buf);
+  let eocd = -1;
+  for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+  if (eocd < 0) throw new Error('Arquivo não é um .xlsx válido.');
+  const n = dv.getUint16(eocd + 10, true); let p = dv.getUint32(eocd + 16, true);
+  const files = {}; const td = new TextDecoder();
+  for (let k = 0; k < n; k++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) break;
+    const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true), xl = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), lho = dv.getUint32(p + 42, true);
+    const name = td.decode(u8.subarray(p + 46, p + 46 + nl)).replace(/\\/g, '/').replace(/^\//, '');
+    files[name.toLowerCase()] = {name, method, csize, lho};
+    p += 46 + nl + xl + cl;
+  }
+  return {
+    names: Object.keys(files),
+    has: nm => !!files[nm.toLowerCase()],
+    async text(nm) {
+      const f = files[nm.toLowerCase()]; if (!f) return null;
+      const start = f.lho + 30 + dv.getUint16(f.lho + 26, true) + dv.getUint16(f.lho + 28, true);
+      const data = u8.subarray(start, start + f.csize);
+      if (f.method === 0) return td.decode(data);
+      if (f.method !== 8) throw new Error('Compressão não suportada no .xlsx.');
+      if (typeof DecompressionStream === 'undefined') throw new Error('Este navegador não lê .xlsx. Salve a planilha como CSV e importe novamente.');
+      const out = await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer();
+      return td.decode(out);
+    }
+  };
+}
+function colIdx(ref) { const m = /^([A-Z]+)/i.exec(ref || ''); if (!m) return -1; let n = 0; for (const ch of m[1].toUpperCase()) n = n * 26 + ch.charCodeAt(0) - 64; return n - 1; }
+async function parseXlsx(buf) {
+  const z = await readZip(buf);
+  const xmlp = s => new DOMParser().parseFromString(s, 'application/xml');
+  let sst = [];
+  const ssName = z.names.find(n => /(^|\/)sharedstrings\.xml$/.test(n));
+  if (ssName) { const d = xmlp(await z.text(ssName)); sst = [...d.getElementsByTagName('si')].map(si => [...si.getElementsByTagName('t')].map(t => t.textContent).join('')); }
+  // primeira planilha: via workbook.xml + rels, senão a primeira sheetN.xml
+  let sheet = null;
+  try {
+    const wb = xmlp(await z.text('xl/workbook.xml'));
+    const first = wb.getElementsByTagName('sheet')[0];
+    const rid = first && (first.getAttribute('r:id') || first.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id'));
+    const rels = xmlp(await z.text('xl/_rels/workbook.xml.rels'));
+    const rel = [...rels.getElementsByTagName('Relationship')].find(r => r.getAttribute('Id') === rid);
+    if (rel) { let t = rel.getAttribute('Target').replace(/\\/g, '/'); t = t.startsWith('/') ? t.slice(1) : 'xl/' + t; t = t.replace(/[^/]+\/\.\.\//g, ''); if (z.has(t)) sheet = t.toLowerCase(); }
+  } catch (e) { /* segue para o plano B */ }
+  if (!sheet) sheet = z.names.filter(n => /sheet\d*\.xml$/.test(n) && !/rels/.test(n)).sort()[0];
+  if (!sheet) throw new Error('Nenhuma planilha encontrada no arquivo.');
+  const d = xmlp(await z.text(sheet));
+  const rows = [];
+  for (const r of d.getElementsByTagName('row')) {
+    const arr = [];
+    for (const c of r.getElementsByTagName('c')) {
+      const i = colIdx(c.getAttribute('r')); if (i < 0) continue;
+      const t = c.getAttribute('t'); let v = '';
+      if (t === 'inlineStr') v = [...c.getElementsByTagName('t')].map(x => x.textContent).join('');
+      else { const ve = c.getElementsByTagName('v')[0]; v = ve ? ve.textContent : ''; if (t === 's') v = sst[Number(v)] ?? ''; }
+      arr[i] = v;
+    }
+    rows.push(arr);
+  }
+  return rows;
+}
+function decodeText(buf) {
+  const u = new TextDecoder('utf-8').decode(buf);
+  if (!u.includes('\uFFFD')) return u.replace(/^\uFEFF/, '');
+  try { return new TextDecoder('windows-1252').decode(buf); } catch (e) { return u; }
+}
+function parseCsv(text) {
+  const lines = text.split(/\r?\n/).slice(0, 20).join('\n');
+  const cnt = ch => (lines.match(new RegExp(ch === '\t' ? '\t' : '\\' + ch, 'g')) || []).length;
+  const sep = [';', '\t', ','].sort((a, b) => cnt(b) - cnt(a))[0];
+  const rows = []; let row = [], f = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (q) { if (ch === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += ch; }
+    else if (ch === '"') q = true;
+    else if (ch === sep) { row.push(f); f = ''; }
+    else if (ch === '\n') { row.push(f.replace(/\r$/, '')); rows.push(row); row = []; f = ''; }
+    else f += ch;
+  }
+  if (f !== '' || row.length) { row.push(f); rows.push(row); }
+  return rows;
+}
+function mapTable(rows) {
+  const avisos = [];
+  const RX = {
+    cod: /^(produto|codigo|cod|cod\.|codigo do produto|cod\. produto|cod produto|item|material|sku)$/,
+    deriv: /deriva/, desc: /(descri|nome do produto|^nome$)/, um: /^(u\.?\s?m\.?|um|unid\.?|unidade|unidade de medida|und\.?)$/,
+    saldo: /(saldo|estoque|qtd\.? erp|quantidade)/, dep: /(deposito|almox)/, fam: /(familia|categoria|grupo)/
+  };
+  let h = -1, map = {};
+  for (let i = 0; i < Math.min(rows.length, 40); i++) {
+    const r = (rows[i] || []).map(norm);
+    const cod = r.findIndex(x => RX.cod.test(x)), sal = r.findIndex(x => RX.saldo.test(x) && !/contag/.test(x));
+    if (cod >= 0 && sal >= 0) {
+      h = i; map.cod = cod; map.saldo = sal;
+      for (const k of ['deriv', 'desc', 'um', 'dep', 'fam']) { const j = r.findIndex((x, idx) => RX[k].test(x) && !Object.values(map).includes(idx)); if (j >= 0) map[k] = j; }
+      break;
+    }
+  }
+  if (h < 0) throw new Error('Não encontrei o cabeçalho. A planilha precisa ter colunas de Código (ou Produto) e Saldo (ou Estoque).');
+  const hdrCod = norm(rows[h][map.cod]);
+  const valid = r => {
+    const cod = String(r[map.cod] ?? '').trim();
+    if (!cod || norm(cod) === hdrCod || !/^[\w.\-\/]+$/.test(cod)) return false;
+    if (r.some(x => /^total/i.test(String(x ?? '').trim()))) return false;
+    return isFinite(parseNum(r[map.saldo]));
+  };
+  const data = rows.slice(h + 1).filter(r => r && valid(r));
+  if (map.desc == null) { // relatórios como o SECE130 trazem a descrição sem título de coluna
+    const used = new Set(Object.values(map)); let best = -1, bestN = 0;
+    const width = Math.max(...data.slice(0, 200).map(r => r.length), 0);
+    for (let j = 0; j < width; j++) {
+      if (used.has(j)) continue;
+      const nTxt = data.slice(0, 200).filter(r => { const v = String(r[j] ?? '').trim(); return v.length > 3 && isNaN(parseNum(v)); }).length;
+      if (nTxt > bestN) { bestN = nTxt; best = j; }
+    }
+    if (best >= 0) { map.desc = best; avisos.push('A coluna de descrição não tinha título; usei a coluna com textos longos.'); }
+  }
+  const byKey = new Map(); let dup = 0;
+  for (const r of data) {
+    const p = {codigo: String(r[map.cod]).trim(), deriv: map.deriv != null ? String(r[map.deriv] ?? '').trim() : '', desc: map.desc != null ? String(r[map.desc] ?? '').trim() : '', um: map.um != null ? String(r[map.um] ?? '').trim().toUpperCase() : '', dep: map.dep != null ? String(r[map.dep] ?? '').trim() : '', fam: map.fam != null ? String(r[map.fam] ?? '').trim() : '', saldo: r3(parseNum(r[map.saldo]))};
+    const k = keyOf(p);
+    if (byKey.has(k)) { byKey.get(k).saldo = r3(byKey.get(k).saldo + p.saldo); dup++; } else byKey.set(k, p);
+  }
+  if (dup) avisos.push(`${dup} linha(s) repetida(s) com mesmo código + derivação + depósito foram somadas.`);
+  const prods = [...byKey.values()];
+  const porUM = {}; for (const p of prods) porUM[p.um || '(sem UM)'] = r3((porUM[p.um || '(sem UM)'] || 0) + p.saldo);
+  const ign = rows.length - h - 1 - data.length;
+  return {prods, linhas: data.length, ignoradas: ign, porUM, avisos, colunas: Object.fromEntries(Object.entries(map).map(([k, v]) => [k, rows[h][v] || '(sem título)']))};
+}
+async function lerArquivo(file) {
+  const buf = await file.arrayBuffer();
+  const u8 = new Uint8Array(buf.slice(0, 8));
+  if (u8[0] === 0x50 && u8[1] === 0x4b) return mapTable(await parseXlsx(buf));
+  if (u8[0] === 0xD0 && u8[1] === 0xCF) throw new Error('Formato .xls antigo não é suportado. Abra no Excel e salve como .xlsx ou .csv.');
+  return mapTable(parseCsv(decodeText(buf)));
+}
+
+// ---------- fotos ----------
+function compressImage(file, max = 1280, q = 0.72) {
+  return new Promise((res, rej) => {
+    const url = URL.createObjectURL(file); const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      res(c.toDataURL('image/jpeg', q));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('Imagem inválida')); };
+    img.src = url;
+  });
+}
+const fotoCache = new Map();
+async function fotoData(id) { if (fotoCache.has(id)) return fotoCache.get(id); const f = await DB.get('fotos', id); const d = f ? f.data : null; fotoCache.set(id, d); return d; }
+async function hydrateThumbs(root = document) {
+  for (const img of root.querySelectorAll('img[data-foto]')) { if (img.src) continue; const d = await fotoData(img.dataset.foto); if (d) img.src = d; }
+}
+function viewer(src) {
+  const v = document.createElement('div'); v.className = 'viewer';
+  v.innerHTML = `<img src="${src}" alt="Foto"><button class="btn sm">Fechar</button>`;
+  v.onclick = () => v.remove(); document.body.appendChild(v);
+}
+
+// ---------- interface: toast e modal ----------
+let tT;
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => t.classList.remove('on'), 2600); }
+function ask({title, text = '', input = null, value = '', options = null, ok = 'Confirmar', cancel = 'Cancelar', danger = false, required = false}) {
+  return new Promise(res => {
+    const m = document.createElement('div'); m.className = 'modal';
+    m.innerHTML = `<div class="box"><h3>${esc(title)}</h3>${text ? `<p class="muted" style="margin:0 0 12px">${text}</p>` : ''}
+      ${options ? `<div class="stack" style="margin-bottom:12px">${options.map((o, i) => `<button class="btn" data-o="${i}">${esc(o)}</button>`).join('')}</div>` : ''}
+      ${input ? `<div class="field"><input class="inp" id="mIn" value="${esc(value)}" placeholder="${esc(input)}"></div>` : ''}
+      <div class="grid2"><button class="btn" data-c>${esc(cancel)}</button>${ok ? `<button class="btn ${danger ? 'danger' : 'pri'}" data-k>${esc(ok)}</button>` : '<span></span>'}</div></div>`;
+    const done = v => { m.remove(); res(v); };
+    m.addEventListener('click', e => {
+      if (e.target === m || e.target.closest('[data-c]')) return done(null);
+      const o = e.target.closest('[data-o]'); if (o) { const inp = $('#mIn', m); if (inp) inp.value = options[+o.dataset.o]; else return done(options[+o.dataset.o]); return; }
+      if (e.target.closest('[data-k]')) { const inp = $('#mIn', m); if (inp) { const v = inp.value.trim(); if (required && !v) { inp.focus(); inp.style.borderColor = 'var(--bad)'; return; } return done(v); } return done(true); }
+    });
+    document.body.appendChild(m); const inp = $('#mIn', m); if (inp) setTimeout(() => inp.focus(), 50);
+  });
+}
+const MOTIVOS = ['Erro de unidade de medida', 'Produto trocado (código parecido)', 'Local esquecido na contagem', 'Movimentação não lançada no ERP', 'Avaria / perda', 'Material em local não acessível', 'Erro de digitação'];
+
+// ---------- roteamento ----------
+const routes = {};
+let ROUTE = '#/'; const STACK = [];
+function go(h, sameScroll) { if (h !== ROUTE) { STACK.push(ROUTE); if (STACK.length > 60) STACK.shift(); ROUTE = h; } render(); if (!sameScroll) window.scrollTo(0, 0); }
+function voltar() { if (STACK.length) { ROUTE = STACK.pop(); render(); window.scrollTo(0, 0); } else go('#/'); }
+function setHeader(title, sub, back) {
+  $('#hTitle').textContent = title; $('#hSub').textContent = sub || (S.inv ? S.inv.nome + (ro() ? ' · ENCERRADO' : '') : 'Nenhum inventário carregado');
+  $('#btnBack').hidden = !back; $('#hUser').textContent = S.cfg.usuario || 'sem usuário';
+}
+function render() {
+  const h = ROUTE || '#/'; const parts = h.replace(/^#\//, '').split('/');
+  const name = parts[0] || 'inicio'; const fn = routes[name] || routes.inicio;
+  const tab = {inicio: 'inicio', produtos: 'produtos', produto: 'produtos', pendencias: 'pendencias', divergencias: 'divergencias'}[name] || 'mais';
+  document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  const r = resumo(); const bp = $('#bPend'), bd = $('#bDiv');
+  bp.hidden = !S.inv || !r.recontar; bp.textContent = r.recontar; bd.hidden = !S.inv || !r.div; bd.textContent = r.div;
+  fn(parts.slice(1));
+  hydrateThumbs();
+}
+$('#btnBack').onclick = voltar;
+$('#tabs').onclick = e => { const b = e.target.closest('button'); if (b) { window.scrollTo(0, 0); go(b.dataset.go); } };
+
+// ---------- tela: início (dashboard) ----------
+routes.inicio = () => {
+  setHeader('INVENTA+', null, false);
+  const v = $('#view');
+  if (!S.inv) {
+    v.innerHTML = `<div class="card"><h2>Bem-vindo</h2><p class="muted small" style="margin-top:0">Importe a planilha de saldos do ERP (Excel .xlsx ou CSV) para começar. Tudo fica salvo neste navegador e funciona sem internet.</p>
+      ${!S.cfg.usuario ? `<div class="field"><label>Seu nome (aparece em cada lançamento)</label><input class="inp" id="uNome" placeholder="Ex.: Weliton"></div>` : ''}
+      <button class="btn pri" id="goImp">Importar planilha do ERP</button>
+      <button class="btn" style="margin-top:10px" id="goBkp">Restaurar backup (.json)</button></div>`;
+    $('#goImp').onclick = async () => { await salvarNomeSeHouver(); go('#/importar'); };
+    $('#goBkp').onclick = async () => { await salvarNomeSeHouver(); go('#/exportar'); };
+    return;
+  }
+  const r = resumo(); const pct = r.total ? Math.round(r.concl / r.total * 100) : 0;
+  const prox = proximo(null);
+  v.innerHTML = `
+    <div class="card"><div class="row"><div class="grow"><b>${esc(S.inv.nome)}</b><div class="xs muted">${r.concl} de ${r.total} produtos concluídos · ${pct}%</div></div>${ro() ? '<span class="tag cinza">ENCERRADO</span>' : ''}</div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="row xs muted" style="gap:14px;flex-wrap:wrap"><span><span class="dot verde" style="display:inline-block;width:10px;height:10px"></span> ${r.verde} verde</span><span><span class="dot amarelo" style="display:inline-block;width:10px;height:10px"></span> ${r.amarelo} amarelo</span><span><span class="dot vermelho" style="display:inline-block;width:10px;height:10px"></span> ${r.vermelho} vermelho</span><span><span class="dot cont" style="display:inline-block;width:10px;height:10px"></span> ${r.cont} em contagem</span></div></div>
+    <div class="kpis">
+      <button class="kpi" data-go="#/produtos"><div class="v">${r.total}</div><div class="l">Total de produtos</div></button>
+      <button class="kpi" data-go="#/produtos/concl"><div class="v">${r.concl}</div><div class="l">Produtos contados</div></button>
+      <button class="kpi" data-go="#/pendencias"><div class="v">${r.nao + r.cont}</div><div class="l">Pendentes de contagem</div></button>
+      <button class="kpi" data-go="#/divergencias"><div class="v" style="color:${r.div ? 'var(--bad)' : 'inherit'}">${r.div}</div><div class="l">Divergentes</div></button>
+      <button class="kpi" data-go="#/pendencias/recontar"><div class="v">${r.recontar}</div><div class="l">Aguardando recontagem</div></button>
+      <button class="kpi" data-go="#/recontagens"><div class="v">${r.recontados}</div><div class="l">Recontagens feitas</div></button>
+    </div>
+    <div class="stack">
+      ${!ro() && prox ? `<button class="btn pri" data-go="#/produto/${prox.id}" style="min-height:62px;font-size:18px">Contar próximo: ${esc(prox.codigo)}${prox.deriv ? ' / ' + esc(prox.deriv) : ''}</button>` : ''}
+      ${!ro() && !prox && r.total ? `<div class="okbox">Todos os produtos foram concluídos. ${r.recontar ? 'Ainda há recontagens pendentes.' : 'Exporte os resultados em Mais › Exportação.'}</div>` : ''}
+      <div class="grid2"><button class="btn" data-go="#/produtos">Produtos</button><button class="btn" data-go="#/pendencias">Pendências</button></div>
+    </div>
+    <p class="xs muted" style="margin-top:14px">Armazenamento: ${DB.mode}${S.cfg.persistido ? ' · protegido contra limpeza' : ''} · ${S.conts.length} lançamentos salvos neste aparelho.</p>`;
+  v.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+};
+async function salvarNomeSeHouver() { const i = $('#uNome'); if (i && i.value.trim()) { S.cfg.usuario = i.value.trim(); await saveCfg(); } }
+function proximo(atual) {
+  const lst = S.prods; if (!lst.length) return null;
+  const start = atual ? lst.findIndex(p => p.id === atual.id) + 1 : 0;
+  for (let k = 0; k < lst.length; k++) { const p = lst[(start + k) % lst.length]; if (p.status !== 'concl' && (!atual || p.id !== atual.id)) return p; }
+  return null;
+}
+
+// ---------- tela: produtos ----------
+routes.produtos = (args) => {
+  setHeader('Produtos', null, false);
+  if (!S.inv) return semInv();
+  if (args[0]) S.filtros.produtos = args[0];
+  const f = S.filtros.produtos;
+  const opts = [['todos', 'Todos'], ['nao', 'Não contados'], ['cont', 'Em contagem'], ['concl', 'Concluídos'], ['div', 'Divergentes']];
+  $('#view').innerHTML = `<div class="search"><input class="inp" id="q" type="search" placeholder="Buscar por código ou descrição" value="${esc(S.filtros.q)}" autocomplete="off">
+     <div class="scrollx" style="margin-top:10px"><div class="chips">${opts.map(([k, l]) => `<button class="chip ${f === k ? 'on' : ''}" data-f="${k}">${l}</button>`).join('')}</div></div></div>
+     <div id="plist"></div>
+     ${!ro() ? `<button class="btn" style="margin-top:12px" id="addNP">+ Item não previsto no ERP</button>` : ''}`;
+  const draw = () => {
+    const q = norm(S.filtros.q); const terms = q.split(/\s+/).filter(Boolean);
+    let arr = S.prods.filter(p => {
+      if (f === 'nao' && p.status !== 'nao') return false;
+      if (f === 'cont' && p.status !== 'cont') return false;
+      if (f === 'concl' && p.status !== 'concl') return false;
+      if (f === 'div' && !(p.status === 'concl' && calc(p).cor !== 'verde')) return false;
+      if (!terms.length) return true;
+      const hay = norm([p.codigo, p.deriv, p.desc, p.dep, p.fam].join(' '));
+      return terms.every(t => hay.includes(t));
+    });
+    $('#plist').innerHTML = arr.length ? `<div class="list">${arr.slice(0, 400).map(itemHTML).join('')}</div>${arr.length > 400 ? '<p class="xs muted">Mostrando 400; refine a busca.</p>' : ''}` : `<div class="empty">Nenhum produto encontrado.</div>`;
+  };
+  draw();
+  $('#q').oninput = e => { S.filtros.q = e.target.value; draw(); };
+  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => go('#/produtos/' + b.dataset.f));
+  $('#plist').onclick = e => { const it = e.target.closest('[data-p]'); if (it) go('#/produto/' + it.dataset.p); };
+  const np = $('#addNP'); if (np) np.onclick = itemNaoPrevisto;
+};
+function itemHTML(p) {
+  const r = calc(p); const s = sit(p);
+  const right = p.status === 'nao' ? (saldoVisivel(p) ? `<div class="muted">ERP</div><b>${fmt(p.saldo)}</b>` : '') :
+    `<div><b>${fmt(r.fis)}</b> <span class="muted">${esc(p.um)}</span></div>${saldoVisivel(p) ? `<div class="${s === 'cont' ? 'muted' : ''}">${s === 'cont' ? 'parcial ' : ''}${fmtPct(r.pct)}</div>` : ''}`;
+  return `<div class="item" data-p="${p.id}"><span class="dot ${dotCls(p)}"></span><div class="main"><div class="code">${esc(p.codigo)}${p.deriv ? ' / ' + esc(p.deriv) : ''} <span class="meta">· ${esc(p.um)}${p.dep ? ' · ' + esc(p.dep) : ''}</span></div><div class="desc">${esc(p.desc || '(sem descrição)')}</div><div class="meta">${statusTag(p)}${!p.previsto ? ' <span class="tag amarelo">NÃO PREVISTO</span>' : ''}</div></div><div class="right">${right}</div></div>`;
+}
+async function itemNaoPrevisto() {
+  const cod = await ask({title: 'Item não previsto no ERP', text: 'Produto encontrado fisicamente que não está na planilha. Informe o código (ou um identificador).', input: 'Código', required: true, ok: 'Continuar'});
+  if (!cod) return;
+  const desc = await ask({title: 'Descrição do item', input: 'Descrição', required: true, ok: 'Continuar'}); if (!desc) return;
+  const um = await ask({title: 'Unidade de medida', options: ['KG', 'UN', 'RL', 'M2', 'L', 'CX'], input: 'UM', value: 'UN', required: true, ok: 'Criar item'}); if (!um) return;
+  const p = {id: uid(), inv: S.inv.id, codigo: cod.trim(), deriv: '', desc: desc.trim(), um: um.trim().toUpperCase(), dep: '', fam: '', saldo: 0, status: 'nao', rodada: 1, aceito: false, motivo: '', previsto: false, criadoEm: nowISO()};
+  S.prods.push(p); S.prods.sort(cmpOrdem); await DB.put('produtos', p);
+  await log('ITEM_NAO_PREVISTO', p, `Criado: ${p.codigo} - ${p.desc} (${p.um})`);
+  toast('Item criado. Registre a contagem com foto.'); go('#/produto/' + p.id);
+}
+function semInv() { $('#view').innerHTML = `<div class="empty">Nenhum inventário carregado.<br><br><button class="btn pri" onclick="go('#/importar')">Importar planilha</button></div>`; }
+
+// ---------- tela: registro de contagem ----------
+routes.produto = (args) => {
+  const p = S.prods.find(x => x.id === args[0]);
+  if (!p) { ROUTE = '#/produtos'; return render(); }
+  setHeader(p.codigo + (p.deriv ? ' / ' + p.deriv : ''), p.desc, true);
+  const r = calc(p); const s = sit(p);
+  const visivel = saldoVisivel(p);
+  const cor = p.status === 'cont' || p.status === 'nao' ? 'cinza' : r.cor;
+  const locais = [...new Set(S.conts.slice().reverse().map(c => c.local).filter(Boolean))];
+  const meus = contsDe(p, p.rodada, true).slice().reverse();
+  const podeContar = !ro() && p.status !== 'concl';
+  const v = $('#view');
+  v.innerHTML = `
+  <div class="card prodhead"><div class="row"><div class="grow"><div class="code">${esc(p.codigo)}${p.deriv ? ' <span class="muted">/ ' + esc(p.deriv) + '</span>' : ''}</div></div>${statusTag(p)}</div>
+    <div class="desc">${esc(p.desc || '(sem descrição)')}</div>
+    <div class="row xs muted" style="flex-wrap:wrap;gap:12px"><span>UM <b style="color:var(--ink)">${esc(p.um || '—')}</b></span>${p.dep ? `<span>Depósito <b style="color:var(--ink)">${esc(p.dep)}</b></span>` : ''}${p.fam ? `<span>Família ${esc(p.fam)}</span>` : ''}<span>Saldo ERP <b style="color:var(--ink)">${visivel ? fmt(p.saldo) + ' ' + esc(p.um) : 'oculto até a 1ª contagem'}</b></span></div></div>
+
+  <div class="res ${cor}" id="resBox"><div class="head"><span>${p.status === 'concl' ? corLabel[r.cor] : (r.n ? 'PARCIAL' : 'SEM CONTAGEM')}${p.rodada > 1 ? ' · rodada ' + p.rodada : ''}</span>${p.status !== 'concl' && r.n && visivel ? `<span class="tag ${r.cor}">${corLabel[r.cor]} se concluir</span>` : ''}</div>
+    <div class="kv"><span class="k">Total físico (${r.n} lanç.)</span><span class="v">${fmt(r.fis)} ${esc(p.um)}</span>
+    ${r.peso != null ? `<span class="k">Peso total</span><span class="v">${fmt(r.peso)} kg</span>` : ''}
+    <span class="k">Saldo ERP</span><span class="v">${visivel ? fmt(r.erp) + ' ' + esc(p.um) : '•••'}</span>
+    <span class="k">Diferença</span><span class="v">${visivel ? fmtSig(r.dif) + ' ' + esc(p.um) : '•••'}</span>
+    <span class="k">Diferença %</span><span class="v">${visivel ? fmtPct(r.pct) : '•••'}</span></div>
+    ${p.aceito ? `<p class="small" style="margin:8px 0 0"><b>Divergência aceita:</b> ${esc(p.motivo)}</p>` : (p.motivo ? `<p class="small" style="margin:8px 0 0"><b>Motivo:</b> ${esc(p.motivo)}</p>` : '')}
+  </div>
+
+  ${podeContar ? `<div class="card" id="form"><h2>Novo lançamento${p.rodada > 1 ? ' · recontagem (rodada ' + p.rodada + ')' : ''}</h2>
+    <div class="field"><label>Local da contagem</label><input class="inp" id="fLocal" list="dlLoc" placeholder="Ex.: Rua A · Pallet 3" value="${esc(S.lastLocal)}" autocomplete="off">
+      <datalist id="dlLoc">${locais.map(l => `<option value="${esc(l)}">`).join('')}</datalist>
+      ${locais.length ? `<div class="scrollx" style="margin-top:8px"><div class="chips">${locais.slice(0, 8).map(l => `<button class="chip ${l === S.lastLocal ? 'on' : ''}" data-loc="${esc(l)}">${esc(l)}</button>`).join('')}</div></div>` : ''}</div>
+    <div class="field"><label>Quantidade contada (${esc(p.um || 'UM')}) — aceita conta: 12*25+8</label><input class="inp big" id="fQtd" inputmode="decimal" placeholder="0" autocomplete="off"><div class="xs muted" id="fQtdPrev" style="text-align:right;min-height:16px"></div></div>
+    <div class="grid2"><div class="field"><label>Peso (kg) — opcional</label><input class="inp" id="fPeso" inputmode="decimal" placeholder="—"></div>
+      <div class="field"><label>Fotos</label><label class="btn" style="min-height:50px;margin:0">📷 Adicionar<input type="file" id="fFoto" accept="image/*" multiple hidden></label></div></div>
+    <div class="thumbs" id="fThumbs"></div>
+    <div class="field" style="margin-top:10px"><label>Observação</label><textarea class="inp" id="fObs" placeholder="Opcional (no iPhone, use o microfone do teclado)"></textarea></div>
+    <button class="btn pri" id="fSalvar" style="min-height:58px;font-size:18px">Salvar lançamento</button>
+  </div>` : ''}
+
+  <div class="card"><div class="row"><h2 class="grow" style="margin:0">Lançamentos${p.rodada > 1 ? ' · rodada ' + p.rodada : ''}</h2><span class="xs muted">${meus.filter(c => c.status === 'valida').length} válidos</span></div>
+    ${meus.length ? meus.map(c => contHTML(c, !ro() && p.status !== 'concl')).join('') : '<div class="empty">Nenhum lançamento ainda.</div>'}
+  </div>
+
+  ${p.rodada > 1 ? comparativoHTML(p) : ''}
+
+  <div class="stack" style="margin-bottom:12px">
+    ${!ro() && p.status !== 'concl' ? `<button class="btn ok" id="aConcl" ${r.n ? '' : 'disabled'}>✓ Concluir produto</button>` : ''}
+    ${!ro() && p.status === 'nao' ? `<button class="btn" id="aZero">Não encontrado (concluir com zero)</button>` : ''}
+    ${!ro() && p.status === 'concl' && s === 'recontar' ? `<button class="btn pri" id="aRec">↻ Iniciar recontagem</button><button class="btn" id="aAceita">Aceitar divergência com justificativa</button>` : ''}
+    ${!ro() && p.status === 'concl' && s !== 'recontar' ? `<button class="btn" id="aRec">↻ Solicitar recontagem</button>` : ''}
+    ${!ro() && p.status === 'concl' ? `<button class="btn" id="aReab">Reabrir para novos lançamentos</button>` : ''}
+    ${(() => { const n = proximo(p); return n ? `<button class="btn" data-go="#/produto/${n.id}">Próximo: ${esc(n.codigo)}${n.deriv ? ' / ' + esc(n.deriv) : ''} ›</button>` : ''; })()}
+    <button class="btn" data-go="#/historico/${p.id}">Histórico deste produto</button>
+  </div>`;
+  v.querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+  v.querySelectorAll('[data-estorno]').forEach(b => b.onclick = () => estornar(p, b.dataset.estorno));
+  v.querySelectorAll('img[data-foto]').forEach(i => i.onclick = () => i.src && viewer(i.src));
+  if (podeContar) bindForm(p);
+  const on = (id, fn) => { const el = $('#' + id); if (el) el.onclick = fn; };
+  on('aConcl', () => concluir(p)); on('aZero', () => naoEncontrado(p)); on('aRec', () => iniciarRecontagem(p)); on('aAceita', () => aceitar(p)); on('aReab', () => reabrir(p));
+};
+function contHTML(c, podeEstornar) {
+  return `<div class="count ${c.status}"><div class="row"><div class="grow"><div class="q">${fmt(c.qtd)}${c.peso != null ? ` <span class="small muted">· ${fmt(c.peso)} kg</span>` : ''}</div><div class="small">${esc(c.local || '(sem local)')}</div>
+    <div class="xs muted">${dt(c.dataHora)} · ${esc(c.usuario)}</div>${c.obs ? `<div class="small" style="margin-top:4px">“${esc(c.obs)}”</div>` : ''}
+    ${c.status === 'estornada' ? `<div class="xs" style="color:var(--bad);margin-top:4px">Estornado em ${dt(c.estornoEm)} — ${esc(c.estornoMotivo)}</div>` : ''}</div>
+    ${podeEstornar && c.status === 'valida' ? `<button class="btn sm danger" data-estorno="${c.id}">Estornar</button>` : ''}</div>
+    ${c.fotos && c.fotos.length ? `<div class="thumbs">${c.fotos.map(f => `<img class="thumb" data-foto="${f}" alt="Foto">`).join('')}</div>` : ''}</div>`;
+}
+function comparativoHTML(p) {
+  const rodadas = [...Array(p.rodada).keys()].map(i => i + 1);
+  const locs = [...new Set(S.conts.filter(c => c.prod === p.id && c.status === 'valida').map(c => c.local || '(sem local)'))];
+  const soma = (l, rd) => { const cs = contsDe(p, rd).filter(c => (c.local || '(sem local)') === l); return cs.length ? r3(cs.reduce((a, c) => a + c.qtd, 0)) : null; };
+  const vis = saldoVisivel(p);
+  return `<div class="card"><h2>Comparativo das contagens</h2><div class="scrollx"><table class="t"><thead><tr><th>Local</th>${rodadas.map(r => `<th class="n">Rod. ${r}</th>`).join('')}</tr></thead><tbody>
+    ${locs.map(l => `<tr><td>${esc(l)}</td>${rodadas.map(r => `<td class="n">${soma(l, r) == null ? '—' : fmt(soma(l, r))}</td>`).join('')}</tr>`).join('')}
+    <tr><td><b>Total</b></td>${rodadas.map(r => `<td class="n"><b>${fmt(calc(p, r).fis)}</b></td>`).join('')}</tr>
+    ${vis ? `<tr><td class="muted">Diferença %</td>${rodadas.map(r => { const c = calc(p, r); return `<td class="n"><span class="tag ${c.cor}">${fmtPct(c.pct)}</span></td>`; }).join('')}</tr>` : ''}
+    </tbody></table></div><p class="xs muted" style="margin-bottom:0">Vale o resultado da rodada ${p.rodada}. As rodadas anteriores ficam guardadas para auditoria.</p></div>`;
+}
+function bindForm(p) {
+  const fq = $('#fQtd'), prev = $('#fQtdPrev');
+  fq.oninput = () => { const t = fq.value.trim(); if (!t) { prev.textContent = ''; return; } const n = evalQtd(t); prev.textContent = isNaN(n) ? 'valor inválido' : (/[+\-*/x×()]/.test(t.replace(/^-/, '')) ? '= ' + fmt(n) + ' ' + p.um : ''); prev.style.color = isNaN(n) ? 'var(--bad)' : ''; };
+  document.querySelectorAll('[data-loc]').forEach(b => b.onclick = () => { $('#fLocal').value = b.dataset.loc; document.querySelectorAll('[data-loc]').forEach(x => x.classList.toggle('on', x === b)); fq.focus(); });
+  S.pending.fotos = S.pending.prod === p.id ? S.pending.fotos : []; S.pending.prod = p.id;
+  const drawThumbs = () => { $('#fThumbs').innerHTML = S.pending.fotos.map((d, i) => `<div class="thumbwrap"><img class="thumb" src="${d}" alt="Foto"><button class="x" data-rm="${i}">×</button></div>`).join(''); };
+  drawThumbs();
+  $('#fThumbs').onclick = e => { const b = e.target.closest('[data-rm]'); if (b) { S.pending.fotos.splice(+b.dataset.rm, 1); drawThumbs(); } else { const i = e.target.closest('img'); if (i) viewer(i.src); } };
+  $('#fFoto').onchange = async e => {
+    for (const f of e.target.files) { try { S.pending.fotos.push(await compressImage(f)); } catch (err) { toast('Não consegui ler uma das imagens.'); } }
+    e.target.value = ''; drawThumbs();
+  };
+  $('#fSalvar').onclick = () => salvarContagem(p);
+}
+async function salvarContagem(p) {
+  const btn = $('#fSalvar'); if (btn.disabled) return;
+  const local = $('#fLocal').value.trim(); const qtd = evalQtd($('#fQtd').value);
+  const pesoTxt = $('#fPeso').value.trim(); const peso = pesoTxt ? evalQtd(pesoTxt) : null; const obs = $('#fObs').value.trim();
+  if (!local) { toast('Informe o local da contagem.'); $('#fLocal').focus(); return; }
+  if ($('#fQtd').value.trim() === '' || isNaN(qtd)) { toast('Informe uma quantidade válida.'); $('#fQtd').focus(); return; }
+  if (qtd < 0) { toast('Quantidade não pode ser negativa.'); return; }
+  if (pesoTxt && (isNaN(peso) || peso < 0)) { toast('Peso inválido.'); $('#fPeso').focus(); return; }
+  // possível duplicidade: mesmo produto + local + quantidade em menos de 3 min
+  const dup = contsDe(p).find(c => c.local === local && c.qtd === qtd && (Date.now() - new Date(c.dataHora).getTime()) < 180000);
+  if (dup && !await ask({title: 'Possível lançamento repetido', text: `Já existe ${fmt(qtd)} ${esc(p.um)} em <b>${esc(local)}</b> às ${hm(dup.dataHora)}. É outro volume?`, ok: 'Sim, lançar'})) return;
+  if (p.saldo > 0 && qtd > p.saldo * 3 && !await ask({title: 'Quantidade muito alta', text: 'O valor está muito acima do esperado para este produto. Confirme se digitou corretamente.', ok: 'Está correto'})) return;
+  btn.disabled = true;
+  try {
+    const c = {id: uid(), inv: S.inv.id, prod: p.id, rodada: p.rodada, local, qtd: r3(qtd), peso: peso == null ? null : r3(peso), obs, fotos: [], usuario: S.cfg.usuario || '(sem nome)', dataHora: nowISO(), status: 'valida', disp: navigator.userAgent.slice(0, 120)};
+    const fotos = S.pending.fotos.map(d => ({id: uid(), inv: S.inv.id, cont: c.id, data: d, ts: c.dataHora}));
+    c.fotos = fotos.map(f => f.id);
+    await DB.putMany('fotos', fotos); fotos.forEach(f => fotoCache.set(f.id, f.data));
+    await DB.put('contagens', c); S.conts.push(c);
+    const antes = p.status; if (p.status === 'nao') { p.status = 'cont'; await DB.put('produtos', p); }
+    await log('CONTAGEM_REGISTRADA', p, `Rodada ${c.rodada} · ${c.local} · ${fmt(c.qtd)} ${p.um}${c.peso != null ? ' · ' + fmt(c.peso) + ' kg' : ''}${fotos.length ? ' · ' + fotos.length + ' foto(s)' : ''}${obs ? ' · obs: ' + obs : ''}`, antes, p.status);
+    S.lastLocal = local; S.pending.fotos = [];
+    const r = calc(p);
+    toast(saldoVisivel(p) ? `Salvo. Total ${fmt(r.fis)} ${p.um} · dif. ${fmtPct(r.pct)}` : `Salvo. Total ${fmt(r.fis)} ${p.um}`);
+    render(); setTimeout(() => { const rb = $('#resBox'); if (rb) rb.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 50);
+  } catch (e) { btn.disabled = false; toast('Erro ao salvar: ' + (e.message || e)); }
+}
+async function estornar(p, cid) {
+  const c = S.conts.find(x => x.id === cid); if (!c) return;
+  const mot = await ask({title: 'Estornar lançamento', text: `${fmt(c.qtd)} ${esc(p.um)} em ${esc(c.local)}. O registro não é apagado: fica marcado como estornado no histórico.`, input: 'Motivo do estorno (obrigatório)', required: true, ok: 'Estornar', danger: true, options: ['Digitado errado', 'Lançado no produto errado', 'Lançamento em duplicidade', 'Local errado']});
+  if (!mot) return;
+  c.status = 'estornada'; c.estornoMotivo = mot; c.estornoEm = nowISO(); c.estornoPor = S.cfg.usuario;
+  await DB.put('contagens', c);
+  await log('CONTAGEM_ESTORNADA', p, `${c.local} · ${fmt(c.qtd)} ${p.um} · motivo: ${mot}`, 'valida', 'estornada');
+  if (!contsDe(p).length && p.status === 'cont' && p.rodada === 1) { p.status = 'nao'; await DB.put('produtos', p); }
+  toast('Lançamento estornado.'); render();
+}
+async function concluir(p) {
+  const r = calc(p);
+  if (!r.n) return;
+  const ok = await ask({title: 'Concluir produto?', text: `Confirme que todos os locais deste produto foram contados.<br><br>Total físico: <b>${fmt(r.fis)} ${esc(p.um)}</b> em ${r.n} lançamento(s).`, ok: 'Concluir'});
+  if (!ok) return;
+  p.status = 'concl'; p.concluidoEm = nowISO(); p.aceito = false;
+  await DB.put('produtos', p);
+  await log('PRODUTO_CONCLUIDO', p, `Rodada ${p.rodada} · físico ${fmt(r.fis)} · ERP ${fmt(r.erp)} · dif ${fmtSig(r.dif)} (${fmtPct(r.pct)}) · ${corLabel[r.cor]}`, 'cont', 'concl');
+  if (r.cor === 'vermelho') toast('Divergência relevante: produto marcado para recontagem.');
+  else toast(r.cor === 'verde' ? 'Concluído: VERDE.' : 'Concluído: AMARELO (atenção).');
+  render(); window.scrollTo(0, 0);
+}
+async function naoEncontrado(p) {
+  const ok = await ask({title: 'Produto não encontrado', text: 'Será registrado um lançamento com quantidade zero e o produto será concluído. Recomenda-se anexar uma foto do local depois, se possível.', input: 'Onde procurou? (local)', value: S.lastLocal, required: true, ok: 'Registrar zero'});
+  if (!ok) return;
+  const c = {id: uid(), inv: S.inv.id, prod: p.id, rodada: p.rodada, local: ok, qtd: 0, peso: null, obs: 'Produto não encontrado', fotos: [], usuario: S.cfg.usuario || '(sem nome)', dataHora: nowISO(), status: 'valida'};
+  await DB.put('contagens', c); S.conts.push(c);
+  await log('CONTAGEM_REGISTRADA', p, `Rodada ${c.rodada} · ${ok} · 0 (não encontrado)`, p.status, 'cont');
+  p.status = 'cont'; await DB.put('produtos', p);
+  await concluir(p);
+}
+async function iniciarRecontagem(p) {
+  const r = calc(p);
+  const ok = await ask({title: `Iniciar recontagem (rodada ${p.rodada + 1})`, text: `Os lançamentos da rodada ${p.rodada} (${fmt(r.fis)} ${esc(p.um)}) ficam guardados e visíveis no comparativo. O novo total físico será apenas o da nova rodada.`, ok: 'Iniciar'});
+  if (!ok) return;
+  p.rodada += 1; p.status = 'cont'; p.aceito = false;
+  await DB.put('produtos', p);
+  await log('RECONTAGEM_INICIADA', p, `Rodada ${p.rodada - 1} tinha físico ${fmt(r.fis)} (${fmtPct(r.pct)})`, 'rodada ' + (p.rodada - 1), 'rodada ' + p.rodada);
+  toast('Recontagem iniciada. Lance novamente todos os locais.'); render(); window.scrollTo(0, 0);
+}
+async function aceitar(p) {
+  const mot = await ask({title: 'Aceitar divergência', text: 'Selecione o motivo e detalhe se necessário. O produto sai da lista de recontagem e continua em Divergências.', options: MOTIVOS, input: 'Motivo / justificativa', required: true, ok: 'Aceitar'});
+  if (!mot) return;
+  const r = calc(p); p.aceito = true; p.motivo = mot; await DB.put('produtos', p);
+  await log('DIVERGENCIA_ACEITA', p, `${fmtSig(r.dif)} ${p.um} (${fmtPct(r.pct)}) · motivo: ${mot}`, 'recontar', 'aceito');
+  toast('Divergência aceita e registrada.'); render();
+}
+async function reabrir(p) {
+  const mot = await ask({title: 'Reabrir produto', text: 'Use para incluir um local que ficou de fora nesta mesma rodada.', input: 'Motivo (obrigatório)', required: true, ok: 'Reabrir'});
+  if (!mot) return;
+  p.status = 'cont'; p.aceito = false; await DB.put('produtos', p);
+  await log('PRODUTO_REABERTO', p, `Rodada ${p.rodada} · motivo: ${mot}`, 'concl', 'cont');
+  render();
+}
+
+// ---------- tela: pendências ----------
+routes.pendencias = (args) => {
+  setHeader('Pendências', null, false); if (!S.inv) return semInv();
+  if (args[0]) S.filtros.pend = args[0];
+  const f = S.filtros.pend; const r = resumo();
+  const opts = [['nao', `Não contados (${r.nao})`], ['cont', `Em contagem (${r.cont})`], ['recontar', `Aguardando recontagem (${r.recontar})`]];
+  const arr = S.prods.filter(p => f === 'recontar' ? sit(p) === 'recontar' : p.status === f);
+  const dica = {nao: 'Produtos sem nenhum lançamento.', cont: 'Produtos com lançamentos que ainda não foram concluídos.', recontar: 'Produtos concluídos em vermelho, à espera de recontagem ou justificativa.'}[f];
+  $('#view').innerHTML = `<div class="scrollx" style="margin-bottom:10px"><div class="chips">${opts.map(([k, l]) => `<button class="chip ${f === k ? 'on' : ''}" data-f="${k}">${l}</button>`).join('')}</div></div>
+    <p class="xs muted" style="margin:0 2px 10px">${dica}</p>
+    ${arr.length ? `<div class="list">${arr.map(itemHTML).join('')}</div>` : `<div class="empty">Nada pendente aqui. ✓</div>`}`;
+  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => go('#/pendencias/' + b.dataset.f));
+  $('#view').querySelectorAll('[data-p]').forEach(it => it.onclick = () => go('#/produto/' + it.dataset.p));
+};
+
+// ---------- tela: divergências ----------
+routes.divergencias = (args) => {
+  setHeader('Divergências', null, false); if (!S.inv) return semInv();
+  if (args[0]) S.filtros.div = args[0];
+  const f = S.filtros.div;
+  let arr = S.prods.filter(p => p.status === 'concl').map(p => ({p, r: calc(p)})).filter(x => x.r.cor !== 'verde');
+  if (f !== 'todos') arr = arr.filter(x => x.r.cor === f);
+  arr.sort((a, b) => (b.r.pct == null ? 1e12 : Math.abs(b.r.pct)) - (a.r.pct == null ? 1e12 : Math.abs(a.r.pct)));
+  const totA = arr.length;
+  $('#view').innerHTML = `<div class="chips" style="margin-bottom:10px">${[['todos', 'Todas'], ['vermelho', 'Vermelho'], ['amarelo', 'Amarelo']].map(([k, l]) => `<button class="chip ${f === k ? 'on' : ''}" data-f="${k}">${l}</button>`).join('')}</div>
+    <p class="xs muted" style="margin:0 2px 10px">${totA} produto(s) concluído(s) fora da faixa verde, da maior para a menor diferença %. Tolerâncias: verde até ${fmt2(S.cfg.tolVerde)}%, amarelo até ${fmt2(S.cfg.tolAmarelo)}%${Number(S.cfg.tolAbs) ? ', ou diferença absoluta até ' + fmt(S.cfg.tolAbs) : ''}.</p>
+    ${arr.length ? `<div class="list">${arr.map(({p, r}) => `<div class="item" data-p="${p.id}"><span class="dot ${r.cor}"></span><div class="main"><div class="code">${esc(p.codigo)}${p.deriv ? ' / ' + esc(p.deriv) : ''} <span class="meta">· ${esc(p.um)}</span></div><div class="desc">${esc(p.desc)}</div><div class="meta">Físico ${fmt(r.fis)} · ERP ${fmt(r.erp)} ${p.aceito ? '· <span class="tag cinza">ACEITO</span>' : ''}${p.rodada > 1 ? ' · R' + p.rodada : ''}</div></div><div class="right"><b style="color:var(--${r.cor === 'vermelho' ? 'bad' : 'warn'})">${fmtPct(r.pct)}</b><div>${fmtSig(r.dif)}</div></div></div>`).join('')}</div>` : `<div class="empty">Nenhuma divergência. ✓</div>`}`;
+  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => go('#/divergencias/' + b.dataset.f));
+  $('#view').querySelectorAll('[data-p]').forEach(it => it.onclick = () => go('#/produto/' + it.dataset.p));
+};
+
+// ---------- tela: recontagens ----------
+routes.recontagens = () => {
+  setHeader('Recontagens', null, true); if (!S.inv) return semInv();
+  const agu = S.prods.filter(p => sit(p) === 'recontar');
+  const feitas = S.prods.filter(p => p.rodada > 1);
+  const linha = p => { const r1 = calc(p, 1), ra = calc(p); return `<div class="item" data-p="${p.id}"><span class="dot ${dotCls(p)}"></span><div class="main"><div class="code">${esc(p.codigo)}${p.deriv ? ' / ' + esc(p.deriv) : ''}</div><div class="desc">${esc(p.desc)}</div><div class="meta">R1 ${fmt(r1.fis)} (${fmtPct(r1.pct)}) → R${p.rodada} ${fmt(ra.fis)} (${fmtPct(ra.pct)})</div></div><div class="right">${statusTag(p)}</div></div>`; };
+  $('#view').innerHTML = `<div class="sec">Aguardando recontagem (${agu.length})</div>
+    ${agu.length ? `<div class="list">${agu.map(p => { const r = calc(p); return `<div class="item" data-p="${p.id}"><span class="dot vermelho"></span><div class="main"><div class="code">${esc(p.codigo)}${p.deriv ? ' / ' + esc(p.deriv) : ''}</div><div class="desc">${esc(p.desc)}</div><div class="meta">Rodada ${p.rodada}: físico ${fmt(r.fis)} · ERP ${fmt(r.erp)}</div></div><div class="right"><b style="color:var(--bad)">${fmtPct(r.pct)}</b></div></div>`; }).join('')}</div>` : '<div class="empty">Nenhum produto aguardando recontagem.</div>'}
+    <div class="sec">Recontagens realizadas (${feitas.length})</div>
+    ${feitas.length ? `<div class="list">${feitas.map(linha).join('')}</div>` : '<div class="empty">Nenhuma recontagem realizada.</div>'}`;
+  $('#view').querySelectorAll('[data-p]').forEach(it => it.onclick = () => go('#/produto/' + it.dataset.p));
+};
+
+// ---------- tela: histórico de auditoria ----------
+routes.historico = (args) => {
+  const p = args[0] ? S.prods.find(x => x.id === args[0]) : null;
+  setHeader(p ? 'Histórico · ' + p.codigo : 'Histórico de auditoria', null, true); if (!S.inv) return semInv();
+  const arr = p ? S.hist.filter(h => h.prod === p.id) : S.hist;
+  $('#view').innerHTML = `<p class="xs muted" style="margin:0 2px 10px">${arr.length} registro(s). Nada é editado ou apagado: correções aparecem como estornos e reaberturas.</p>
+    ${arr.length ? `<div class="list">${arr.slice(0, 500).map(h => `<div class="item" style="cursor:default;align-items:flex-start"><div class="main"><div class="row"><b class="small grow">${esc(h.acao.replace(/_/g, ' '))}</b><span class="xs muted">${dt(h.ts)}</span></div>${h.prodRef ? `<div class="xs"><b>${esc(h.prodRef)}</b></div>` : ''}<div class="small" style="white-space:normal">${esc(h.detalhe)}</div>${h.antes || h.depois ? `<div class="xs muted">${esc(h.antes)} → ${esc(h.depois)}</div>` : ''}<div class="xs muted">${esc(h.usuario)}</div></div></div>`).join('')}</div>` : '<div class="empty">Sem registros.</div>'}`;
+};
+
+// ---------- tela: mais ----------
+routes.mais = () => {
+  setHeader('Mais', null, false);
+  const it = (href, i, t, d) => `<div class="item" data-go="${href}"><span class="i">${i}</span><div class="main"><div class="code" style="font-size:16px">${t}</div><div class="meta">${d}</div></div><span class="muted">›</span></div>`;
+  $('#view').innerHTML = `<div class="list menu">
+    ${it('#/recontagens', '↻', 'Recontagens', 'Aguardando e realizadas, com comparativo')}
+    ${it('#/exportar', '⇩', 'Exportação e backup', 'CSV, relatório de evidências, backup completo')}
+    ${it('#/historico', '☷', 'Histórico de auditoria', 'Todas as ações registradas')}
+    ${it('#/importar', '⇧', 'Importar planilha do ERP', 'Cria um novo inventário')}
+    ${it('#/config', '⚙', 'Configurações', 'Usuário, tolerâncias, inventários')}
+  </div>`;
+  $('#view').querySelectorAll('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+};
+
+// ---------- tela: importar ----------
+let importPrev = null;
+routes.importar = () => {
+  setHeader('Importar planilha', 'Excel (.xlsx) ou CSV', true);
+  const v = $('#view');
+  v.innerHTML = `<div class="card"><h2>1. Escolha o arquivo</h2><p class="small muted" style="margin-top:0">A planilha precisa ter colunas de <b>Código</b> (ou Produto), <b>Descrição</b>, <b>Unidade de medida</b> e <b>Saldo</b> (ou Estoque). Relatórios do ERP com cabeçalhos repetidos por página e linhas de total são limpos automaticamente. Derivação e Depósito são lidos se existirem.</p>
+    <label class="btn pri">Selecionar arquivo<input type="file" id="iFile" accept=".xlsx,.csv,.txt,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" hidden></label></div><div id="iPrev"></div>`;
+  $('#iFile').onchange = async e => {
+    const f = e.target.files[0]; if (!f) return;
+    $('#iPrev').innerHTML = '<div class="empty">Lendo arquivo…</div>';
+    try {
+      const res = await lerArquivo(f); importPrev = {...res, arquivo: f.name};
+      if (!res.prods.length) throw new Error('Nenhum produto válido encontrado.');
+      const hoje = new Date().toLocaleDateString('pt-BR');
+      $('#iPrev').innerHTML = `<div class="card"><h2>2. Confira antes de importar</h2>
+        ${res.avisos.map(a => `<div class="warnbox">${esc(a)}</div>`).join('')}
+        <div class="kv" style="margin-bottom:10px"><span class="k">Arquivo</span><span class="v">${esc(f.name)}</span><span class="k">Linhas de produto lidas</span><span class="v">${res.linhas}</span><span class="k">Produtos (código + derivação + depósito)</span><span class="v">${res.prods.length}</span><span class="k">Linhas ignoradas (cabeçalhos, totais, vazias)</span><span class="v">${res.ignoradas}</span></div>
+        <div class="sec" style="margin-top:6px">Saldo total por unidade de medida</div>
+        <table class="t"><tbody>${Object.entries(res.porUM).map(([u, s]) => `<tr><td>${esc(u)}</td><td class="n">${fmt(s)}</td></tr>`).join('')}</tbody></table>
+        <p class="xs muted">Compare estes totais com o relatório do ERP.</p>
+        <div class="sec">Colunas reconhecidas</div><p class="small" style="margin-top:0">${Object.entries(res.colunas).map(([k, c]) => `<span class="pill">${k}: ${esc(c)}</span>`).join(' ')}</p>
+        <div class="sec">Prévia</div><div class="scrollx"><table class="t"><thead><tr><th>Código</th><th>Deriv.</th><th>Descrição</th><th>UM</th><th>Dep.</th><th class="n">Saldo</th></tr></thead><tbody>${res.prods.slice(0, 8).map(p => `<tr><td>${esc(p.codigo)}</td><td>${esc(p.deriv)}</td><td>${esc(p.desc)}</td><td>${esc(p.um)}</td><td>${esc(p.dep)}</td><td class="n">${fmt(p.saldo)}</td></tr>`).join('')}</tbody></table></div>
+        <div class="field" style="margin-top:14px"><label>Nome do inventário</label><input class="inp" id="iNome" value="${esc('Inventário ' + hoje + ' · ' + f.name.replace(/\.[^.]+$/, ''))}"></div>
+        <button class="btn pri" id="iOk">Importar ${res.prods.length} produtos</button></div>`;
+      $('#iOk').onclick = confirmarImport;
+    } catch (err) { $('#iPrev').innerHTML = `<div class="errbox">${esc(err.message || err)}</div>`; }
+    e.target.value = '';
+  };
+};
+async function confirmarImport() {
+  const res = importPrev; if (!res) return;
+  $('#iOk').disabled = true;
+  const inv = {id: uid(), nome: $('#iNome').value.trim() || 'Inventário', criadoEm: nowISO(), arquivo: res.arquivo, linhas: res.linhas, porUM: res.porUM, status: 'aberto', usuario: S.cfg.usuario};
+  const prods = res.prods.map(p => ({id: uid(), inv: inv.id, ...p, status: 'nao', rodada: 1, aceito: false, motivo: '', previsto: true}));
+  await DB.put('inventarios', inv); await DB.putMany('produtos', prods);
+  S.cfg.invAtivo = inv.id; await saveCfg();
+  S.invs.unshift(inv); S.inv = inv; await loadInv();
+  await log('IMPORTACAO', null, `Arquivo ${res.arquivo} · ${prods.length} produtos · totais por UM: ${Object.entries(res.porUM).map(([u, s]) => u + ' ' + fmt(s)).join('; ')}`);
+  importPrev = null; toast('Inventário criado.'); go('#/');
+}
+
+// ---------- tela: configurações ----------
+routes.config = () => {
+  setHeader('Configurações', null, true);
+  const c = S.cfg;
+  $('#view').innerHTML = `
+  <div class="card"><h2>Responsável</h2><div class="field"><label>Nome do usuário (gravado em cada lançamento)</label><input class="inp" id="cUser" value="${esc(c.usuario)}" placeholder="Seu nome"></div></div>
+  <div class="card"><h2>Tolerâncias do semáforo</h2>
+    <p class="small muted" style="margin-top:0">Diferença % = (físico − ERP) ÷ ERP. Com 0 e 0, qualquer diferença fica vermelha.</p>
+    <div class="grid2"><div class="field"><label>Verde até (± %)</label><input class="inp" id="cTV" inputmode="decimal" value="${String(c.tolVerde).replace('.', ',')}"></div>
+    <div class="field"><label>Amarelo até (± %)</label><input class="inp" id="cTA" inputmode="decimal" value="${String(c.tolAmarelo).replace('.', ',')}"></div></div>
+    <div class="field"><label>Diferença absoluta considerada verde (na UM do produto)</label><input class="inp" id="cTAbs" inputmode="decimal" value="${String(c.tolAbs).replace('.', ',')}"></div>
+    <p class="xs muted">Acima do amarelo = vermelho (exige recontagem).</p></div>
+  <div class="card"><h2>Contagem</h2><div class="sw"><div><b>Contagem cega</b><div class="xs muted">Esconde o saldo ERP até o primeiro lançamento do produto, para o número esperado não influenciar a contagem.</div></div><input type="checkbox" id="cCega" ${c.cega ? 'checked' : ''}></div></div>
+  <button class="btn pri" id="cSalvar" style="margin-bottom:12px">Salvar configurações</button>
+  <div class="card"><h2>Inventários neste aparelho</h2>
+    ${S.invs.length ? `<div class="list">${S.invs.map(i => `<div class="item" style="cursor:default"><div class="main"><div class="code" style="font-size:15px">${esc(i.nome)}</div><div class="meta">${dt(i.criadoEm)} · ${esc(i.arquivo || '')} · ${i.status === 'encerrado' ? 'encerrado' : 'aberto'}</div></div>${i.id === (S.inv && S.inv.id) ? '<span class="tag azul">ATIVO</span>' : `<button class="btn sm" data-ativar="${i.id}">Ativar</button>`}</div>`).join('')}</div>` : '<div class="empty">Nenhum.</div>'}
+    ${S.inv ? `<div class="stack" style="margin-top:12px">
+      <button class="btn" id="cRen">Renomear inventário ativo</button>
+      ${!ro() ? `<button class="btn" id="cEnc">Encerrar inventário ativo (somente leitura)</button>` : `<button class="btn" id="cReab">Reabrir inventário encerrado</button>`}
+      <button class="btn danger" id="cDel">Excluir inventário ativo</button></div>` : ''}
+  </div>
+  <div class="card"><h2>Armazenamento</h2><p class="small" style="margin-top:0">Modo: <b>${DB.mode}</b>${S.cfg.persistido ? ' · protegido contra limpeza automática' : ''}.</p>
+    <p class="xs muted">Os dados ficam só neste navegador. Limpar dados do navegador apaga o inventário: exporte um backup ao final de cada contagem.</p>
+    <button class="btn" id="cPers">Pedir proteção contra limpeza</button></div>`;
+  const num = id => { const n = parseNum($(id).value || '0'); return isNaN(n) || n < 0 ? null : n; };
+  $('#cSalvar').onclick = async () => {
+    const tv = num('#cTV'), ta = num('#cTA'), tabs = num('#cTAbs');
+    if (tv == null || ta == null || tabs == null) return toast('Valores de tolerância inválidos.');
+    if (ta < tv) return toast('O limite amarelo deve ser maior ou igual ao verde.');
+    const antes = JSON.stringify({u: c.usuario, tv: c.tolVerde, ta: c.tolAmarelo, tabs: c.tolAbs, cega: c.cega});
+    Object.assign(c, {usuario: $('#cUser').value.trim(), tolVerde: tv, tolAmarelo: ta, tolAbs: tabs, cega: $('#cCega').checked});
+    await saveCfg(); await log('CONFIG_ALTERADA', null, 'Configurações salvas', antes, JSON.stringify({u: c.usuario, tv, ta, tabs, cega: c.cega}));
+    toast('Configurações salvas.'); render();
+  };
+  document.querySelectorAll('[data-ativar]').forEach(b => b.onclick = async () => { S.cfg.invAtivo = b.dataset.ativar; await saveCfg(); S.inv = S.invs.find(i => i.id === b.dataset.ativar); await loadInv(); toast('Inventário ativado.'); render(); });
+  const on = (id, fn) => { const el = $('#' + id); if (el) el.onclick = fn; };
+  on('cRen', async () => { const n = await ask({title: 'Renomear', input: 'Nome', value: S.inv.nome, required: true, ok: 'Salvar'}); if (!n) return; const a = S.inv.nome; S.inv.nome = n; await DB.put('inventarios', S.inv); await log('INVENTARIO_RENOMEADO', null, '', a, n); render(); });
+  on('cEnc', async () => {
+    const r = resumo();
+    const txt = r.pend ? `Ainda há ${r.nao} não contado(s), ${r.cont} em contagem e ${r.recontar} aguardando recontagem. Informe a justificativa para encerrar assim.` : 'Todos os produtos foram concluídos. Após encerrar, o inventário fica somente leitura.';
+    const j = await ask({title: 'Encerrar inventário', text: txt, input: r.pend ? 'Justificativa (obrigatória)' : 'Observação (opcional)', required: !!r.pend, ok: 'Encerrar'});
+    if (j === null) return;
+    S.inv.status = 'encerrado'; S.inv.encerradoEm = nowISO(); await DB.put('inventarios', S.inv);
+    await log('INVENTARIO_ENCERRADO', null, `Pendências: ${r.nao} não contados, ${r.cont} em contagem, ${r.recontar} recontagens · ${j || ''}`, 'aberto', 'encerrado'); toast('Inventário encerrado.'); render();
+  });
+  on('cReab', async () => { const j = await ask({title: 'Reabrir inventário', input: 'Motivo (obrigatório)', required: true, ok: 'Reabrir'}); if (!j) return; S.inv.status = 'aberto'; await DB.put('inventarios', S.inv); await log('INVENTARIO_REABERTO', null, j, 'encerrado', 'aberto'); render(); });
+  on('cDel', async () => {
+    const t = await ask({title: 'Excluir inventário', text: `Isto apaga <b>${esc(S.inv.nome)}</b> deste aparelho, com lançamentos, fotos e histórico. Exporte um backup antes. Para confirmar, digite EXCLUIR.`, input: 'EXCLUIR', required: true, ok: 'Excluir', danger: true});
+    if (t !== 'EXCLUIR') { if (t) toast('Texto não confere. Nada foi excluído.'); return; }
+    const id = S.inv.id;
+    await DB.delMany('produtos', S.prods.map(p => p.id)); await DB.delMany('contagens', S.conts.map(c => c.id));
+    await DB.delMany('fotos', (await DB.all('fotos')).filter(f => f.inv === id).map(f => f.id)); await DB.delMany('historico', S.hist.map(h => h.id));
+    await DB.delMany('inventarios', [id]); S.invs = S.invs.filter(i => i.id !== id); S.inv = S.invs[0] || null; S.cfg.invAtivo = S.inv ? S.inv.id : null; await saveCfg(); await loadInv();
+    toast('Inventário excluído.'); go('#/');
+  });
+  on('cPers', pedirPersistencia);
+};
+async function pedirPersistencia(silencioso) {
+  try {
+    if (navigator.storage && navigator.storage.persist) {
+      const ok = (await navigator.storage.persisted()) || (await navigator.storage.persist());
+      S.cfg.persistido = !!ok; await saveCfg();
+      if (silencioso !== true) toast(ok ? 'Armazenamento protegido.' : 'O navegador não concedeu proteção. Faça backups regulares.');
+    } else if (silencioso !== true) toast('Este navegador não oferece essa proteção. Faça backups regulares.');
+  } catch (e) { if (silencioso !== true) toast('Não foi possível pedir proteção.'); }
+}
+
+// ---------- exportação ----------
+function csv(rows) {
+  const cell = v => { if (v == null) return ''; if (typeof v === 'number') return String(v).replace('.', ','); const s = String(v); return /[;"\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  return '\uFEFF' + rows.map(r => r.map(cell).join(';')).join('\r\n');
+}
+// código como texto no Excel (preserva zeros à esquerda: 00136)
+const txt = v => (v == null || v === '') ? '' : (/^0\d/.test(String(v)) ? '="' + v + '"' : String(v));
+async function baixar(nome, conteudo, tipo) {
+  const blob = new Blob([conteudo], {type: tipo});
+  if (window.claude && typeof window.claude.use === 'function') {
+    const dl = await window.claude.use('downloads').catch(() => null);
+    if (dl) {
+      try { await dl.save({filename: nome, data: blob}); return true; }
+      catch (e) { if (e && e.code === 'declined') { toast('Download cancelado.'); return false; } if (e && e.code === 'rate_limited') { toast('Aguarde a confirmação anterior e tente de novo.'); return false; } throw new Error('Download indisponível nesta visualização. Abra o app no navegador.'); }
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nome; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000); return true;
+}
+const slug = s => norm(s).replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 40) || 'inventario';
+const situacaoTxt = p => ({nao: 'Não contado', cont: 'Em contagem', recontar: 'Aguardando recontagem', verde: 'Verde', amarelo: 'Amarelo', vermelho: 'Vermelho (aceito)'})[sit(p)];
+function exportConsolidado() {
+  const rows = [['Código', 'Derivação', 'Descrição', 'Depósito', 'Família', 'UM', 'Saldo ERP', 'Total físico', 'Peso total (kg)', 'Diferença', 'Diferença %', 'Semáforo', 'Situação', 'Rodada vigente', 'Nº lançamentos', 'Locais', 'Previsto no ERP', 'Motivo / justificativa', 'Concluído em']];
+  for (const p of S.prods) {
+    const r = calc(p); const locs = [...new Set(contsDe(p).map(c => c.local))].join(' | ');
+    rows.push([txt(p.codigo), txt(p.deriv), p.desc, p.dep, p.fam, p.um, p.saldo, p.status === 'nao' ? null : r.fis, r.peso, p.status === 'nao' ? null : r.dif, p.status === 'nao' || r.pct == null ? null : r3(r.pct), p.status === 'concl' ? corLabel[r.cor] : '', situacaoTxt(p), p.rodada, r.n, locs, p.previsto ? 'Sim' : 'Não', p.motivo, p.concluidoEm ? dt(p.concluidoEm) : '']);
+  }
+  return baixar(`consolidado_${slug(S.inv.nome)}.csv`, csv(rows), 'text/csv;charset=utf-8');
+}
+function exportContagens() {
+  const byId = Object.fromEntries(S.prods.map(p => [p.id, p]));
+  const rows = [['ID lançamento', 'Código', 'Derivação', 'Descrição', 'UM', 'Rodada', 'Local', 'Quantidade', 'Peso (kg)', 'Observação', 'Nº fotos', 'Usuário', 'Data/hora', 'Situação', 'Motivo estorno', 'Estornado em']];
+  for (const c of S.conts) { const p = byId[c.prod] || {}; rows.push([c.id, txt(p.codigo), txt(p.deriv), p.desc, p.um, c.rodada, c.local, c.qtd, c.peso, c.obs, (c.fotos || []).length, c.usuario, dt(c.dataHora), c.status === 'valida' ? 'Válida' : 'Estornada', c.estornoMotivo || '', c.estornoEm ? dt(c.estornoEm) : '']); }
+  return baixar(`contagens_${slug(S.inv.nome)}.csv`, csv(rows), 'text/csv;charset=utf-8');
+}
+function exportRecontagens() {
+  const rows = [['Código', 'Derivação', 'Descrição', 'UM', 'Saldo ERP', 'Rodada', 'Total físico', 'Diferença', 'Diferença %', 'Semáforo', 'Rodada vigente', 'Motivo']];
+  for (const p of S.prods.filter(p => p.rodada > 1)) for (let rd = 1; rd <= p.rodada; rd++) { const r = calc(p, rd); rows.push([txt(p.codigo), txt(p.deriv), p.desc, p.um, p.saldo, rd, r.fis, r.dif, r.pct == null ? null : r3(r.pct), corLabel[r.cor], rd === p.rodada ? 'Sim' : 'Não', p.motivo]); }
+  return baixar(`recontagens_${slug(S.inv.nome)}.csv`, csv(rows), 'text/csv;charset=utf-8');
+}
+function exportHistorico() {
+  const rows = [['Data/hora', 'Usuário', 'Ação', 'Produto', 'Detalhe', 'Antes', 'Depois']];
+  for (const h of S.hist.slice().reverse()) rows.push([dt(h.ts), h.usuario, h.acao, h.prodRef, h.detalhe, h.antes, h.depois]);
+  return baixar(`historico_${slug(S.inv.nome)}.csv`, csv(rows), 'text/csv;charset=utf-8');
+}
+async function exportEvidencias() {
+  const r0 = resumo(); const byId = Object.fromEntries(S.prods.map(p => [p.id, p]));
+  const comFoto = S.conts.filter(c => c.fotos && c.fotos.length || c.obs || c.status === 'estornada');
+  let blocos = '';
+  for (const p of S.prods) {
+    const cs = comFoto.filter(c => c.prod === p.id); const r = calc(p);
+    const div = p.status === 'concl' && r.cor !== 'verde';
+    if (!cs.length && !div) continue;
+    let h = `<section><h3>${esc(p.codigo)}${p.deriv ? ' / ' + esc(p.deriv) : ''} — ${esc(p.desc)}</h3><p>UM ${esc(p.um)} · ERP ${fmt(p.saldo)} · Físico ${fmt(r.fis)} · Dif. ${fmtSig(r.dif)} (${fmtPct(r.pct)}) · <b>${esc(situacaoTxt(p))}</b>${p.motivo ? ' · Motivo: ' + esc(p.motivo) : ''}</p>`;
+    for (const c of cs) {
+      h += `<div class="c"><b>R${c.rodada} · ${esc(c.local)} · ${fmt(c.qtd)}${c.peso != null ? ' · ' + fmt(c.peso) + ' kg' : ''}</b> — ${dt(c.dataHora)} · ${esc(c.usuario)}${c.status === 'estornada' ? ` · <span style="color:#c53030">ESTORNADO: ${esc(c.estornoMotivo)}</span>` : ''}${c.obs ? `<br>Obs.: ${esc(c.obs)}` : ''}<div>`;
+      for (const fid of c.fotos || []) { const d = await fotoData(fid); if (d) h += `<img src="${d}">`; }
+      h += '</div></div>';
+    }
+    blocos += h + '</section>';
+  }
+  const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Evidências · ${esc(S.inv.nome)}</title><style>body{font:14px/1.45 Arial,sans-serif;margin:24px;color:#111}h1{font-size:20px}h3{font-size:15px;margin:22px 0 4px;border-top:1px solid #ccc;padding-top:12px}.c{margin:8px 0 8px 10px}img{width:220px;max-width:45%;margin:6px 6px 0 0;border:1px solid #ccc;border-radius:4px;vertical-align:top}section{page-break-inside:avoid}</style></head><body>
+    <h1>Relatório de evidências — ${esc(S.inv.nome)}</h1><p>Gerado em ${dt(nowISO())} por ${esc(S.cfg.usuario || '(sem nome)')} · Arquivo de origem: ${esc(S.inv.arquivo || '')}<br>Produtos: ${r0.total} · Concluídos: ${r0.concl} · Verde: ${r0.verde} · Amarelo: ${r0.amarelo} · Vermelho: ${r0.vermelho} · Não contados: ${r0.nao}<br>Tolerâncias: verde até ${fmt2(S.cfg.tolVerde)}%, amarelo até ${fmt2(S.cfg.tolAmarelo)}%.</p>
+    ${blocos || '<p>Nenhum lançamento com foto, observação ou estorno, e nenhuma divergência.</p>'}</body></html>`;
+  return baixar(`evidencias_${slug(S.inv.nome)}.html`, html, 'text/html;charset=utf-8');
+}
+async function exportBackup() {
+  const id = S.inv.id;
+  const fotos = (await DB.all('fotos')).filter(f => f.inv === id);
+  const data = {app: 'INVENTA+', versao: 1, exportadoEm: nowISO(), config: S.cfg, inventario: S.inv, produtos: S.prods, contagens: S.conts, fotos, historico: S.hist};
+  const ok = await baixar(`backup_${slug(S.inv.nome)}_${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.json`, JSON.stringify(data), 'application/json');
+  if (!ok) return false;
+  S.inv.ultimoBackup = nowISO(); await DB.put('inventarios', S.inv);
+  await log('BACKUP_EXPORTADO', null, `${S.conts.length} lançamentos · ${fotos.length} fotos`);
+  return true;
+}
+async function importBackup(file) {
+  try {
+    const d = JSON.parse(await file.text());
+    if (d.app !== 'INVENTA+' || !d.inventario || !Array.isArray(d.produtos)) throw new Error('Arquivo não é um backup do INVENTA+.');
+    const existe = S.invs.find(i => i.id === d.inventario.id);
+    const ok = await ask({title: 'Restaurar backup', text: `<b>${esc(d.inventario.nome)}</b><br>${d.produtos.length} produtos · ${d.contagens.length} lançamentos · ${(d.fotos || []).length} fotos<br>Exportado em ${dt(d.exportadoEm)}.${existe ? '<br><br><b>Este inventário já existe neste aparelho e será substituído pela versão do backup.</b>' : ''}`, ok: existe ? 'Substituir' : 'Restaurar', danger: !!existe});
+    if (!ok) return;
+    if (existe) {
+      const id = existe.id;
+      await DB.delMany('produtos', (await DB.all('produtos')).filter(p => p.inv === id).map(p => p.id));
+      await DB.delMany('contagens', (await DB.all('contagens')).filter(c => c.inv === id).map(c => c.id));
+      await DB.delMany('fotos', (await DB.all('fotos')).filter(f => f.inv === id).map(f => f.id));
+      await DB.delMany('historico', (await DB.all('historico')).filter(h => h.inv === id).map(h => h.id));
+    }
+    await DB.put('inventarios', d.inventario); await DB.putMany('produtos', d.produtos); await DB.putMany('contagens', d.contagens || []);
+    await DB.putMany('fotos', d.fotos || []); await DB.putMany('historico', d.historico || []);
+    if (!S.cfg.usuario && d.config && d.config.usuario) S.cfg.usuario = d.config.usuario;
+    if (d.config) for (const k of ['tolVerde', 'tolAmarelo', 'tolAbs', 'cega']) if (d.config[k] != null) S.cfg[k] = d.config[k]; // mesmas regras do aparelho de origem
+    S.cfg.invAtivo = d.inventario.id; await saveCfg(); await loadAll();
+    await log('BACKUP_IMPORTADO', null, `Arquivo ${file.name} (exportado em ${dt(d.exportadoEm)})`);
+    toast('Backup restaurado.'); go('#/');
+  } catch (e) { toast('Erro: ' + (e.message || e)); }
+}
+routes.exportar = () => {
+  setHeader('Exportação e backup', null, true);
+  const has = !!S.inv;
+  $('#view').innerHTML = `
+  ${has ? `<div class="card"><h2>Resultados em CSV (abre no Excel)</h2><p class="xs muted" style="margin-top:0">Separador ponto e vírgula, decimal com vírgula.</p><div class="stack">
+    <button class="btn pri" id="e1">Consolidado por produto</button>
+    <button class="btn" id="e2">Todos os lançamentos (inclui estornos)</button>
+    <button class="btn" id="e3">Comparativo de recontagens</button>
+    <button class="btn" id="e4">Histórico de auditoria</button></div></div>
+  <div class="card"><h2>Relatório de evidências</h2><p class="xs muted" style="margin-top:0">Página HTML com divergências, observações, estornos e fotos; abra no navegador e imprima em PDF.</p><button class="btn" id="e5">Gerar relatório de evidências</button></div>` : ''}
+  <div class="card"><h2>Backup completo</h2><p class="xs muted" style="margin-top:0">Arquivo .json com produtos, lançamentos, fotos e histórico. Use para guardar o inventário ou levá-lo do celular para o computador (restaure no outro aparelho).${has && S.inv.ultimoBackup ? ' Último backup: ' + dt(S.inv.ultimoBackup) + '.' : ''}</p>
+    <div class="stack">${has ? '<button class="btn pri" id="e6">Exportar backup</button>' : ''}<label class="btn">Restaurar backup<input type="file" id="e7" accept=".json,application/json" hidden></label></div></div>`;
+  const on = (id, fn) => { const el = $('#' + id); if (el) el.onclick = async () => { try { const ok = await fn(); if (ok === false) return; if (id !== 'e6') await log('EXPORTACAO', null, el.textContent.trim()); toast('Arquivo gerado.'); } catch (e) { toast('Erro: ' + (e.message || e)); } }; };
+  on('e1', exportConsolidado); on('e2', exportContagens); on('e3', exportRecontagens); on('e4', exportHistorico); on('e5', exportEvidencias); on('e6', exportBackup);
+  $('#e7').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) importBackup(f); };
+};
+
+// ---------- início ----------
+(async function init() {
+  await DB.open();
+  await loadAll();
+  if (!S.cfg.persistido) pedirPersistencia(true);
+  // modo offline do site: guarda o app no aparelho para reabrir sem internet
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
+  render();
+})();
+</script>
+</body>
+</html>
